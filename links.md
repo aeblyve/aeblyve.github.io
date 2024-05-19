@@ -1,5 +1,5 @@
 ---
-build_date: 2024-05-19 21:30:58+00:00
+build_date: 2024-05-19 21:42:15+00:00
 title: Links
 link: https://leonid.belyaev.systems/links.html
 ---
@@ -17,3 +17,4 @@ link: https://leonid.belyaev.systems/links.html
 * [USB Differential Pair Routing](https://www.masterzen.fr/2020/10/20/designing-a-keyboard-part3/#usb-differential-pair)
 * [Davis Remmel](http://www.davisr.me/)
 * [George Hotz](https://geohot.github.io/blog/)
+* [100 Rabbits](https://100r.co/site/home.html)
