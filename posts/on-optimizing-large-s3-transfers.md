@@ -1,7 +1,7 @@
 ---
 create_date: 2024-05-12 23:51:41+00:00
 edit_date: 2024-05-12 23:51:41+00:00
-build_date: 2024-05-19 20:35:05+00:00
+build_date: 2024-05-19 21:06:09+00:00
 title: On Optimizing Large S3 Transfers
 link: https://leonid.belyaev.systems/posts/on-optimizing-large-s3-transfers.html
 ---
