@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="utf-8">
+	<meta name="description" content="The personal website of Leonid Belyaev.">
+	<meta name="author" content="Leonid Belyaev">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/style.css">
+	<title>On Optimizing Large S3 Transfers</title>
+    </head>
+    <body>
+	<main>
+	    <div class="main-container">
+	    <div class="sidebar">
+
+	<div class="bannerbox">
+	<div class="namebox">
+	<a href="/">
+	Leonid Belyaev
+	<small>
+	leonid.belyaev.systems
+	</small>
+	</a>
+	</div>
+	</div>
+
+	<nav>
+	<ul>
+		<li>
+			<a href="/about.html">About</a>
+		</li>
+		<li>
+			<a href="/posts.html">Posts</a>
+		</li>
+		<li>
+			<a href="/links.html">Links</a>
+		</li>
+		<li>
+			<a href="/uses-this.html">Uses This</a>
+		</li>
+
+		<li>
+			<a href="https://github.com/aeblyve">GitHub</a>
+		</li>
+		<li>
+			<a href="mail:lennybelyaev@gmail.com">lennybelyaev@gmail.com</a>
+		</li>
+		<li>
+			<a href="/leonidbelyaevsystems.zip">Download Site Archive</a>
+		</li>
+		<li>
+			<a href="/rss.xml">RSS Feed</a>
+		</li>
+	</ul>
+	</nav>
+	<div class="disclaimer">
+		<small>
+		<p>
+		Opinions are my own and not representative of my employers.
+		</p>
+		</small>
+		<small>
+		<p>
+		All site content CC-0 unless otherwise indicated.
+		</p>
+		</small>
+	</div>
+
+
+	<br/>
+	<br/>
+	</div>
+	    <article>
+	      <div class="articleheader">
+
+		      <div class="articletitle">
+			<h1>On Optimizing Large S3 Transfers</h1>
+			<small class="raw"><a href="/posts/on-optimizing-large-s3-transfers.md">Raw Markdown</a></small>
+		      </div>
+		
+		<div>
+		<small>Created at: 2024-05-12 23:51:41+00:00</small>
+		<small>Edited at: 2024-05-12 23:51:41+00:00</small>
+		</div>
+		
+	      </div>
+
+	      <div class="articlecontent">
+		    <p>Let's say that you're lucky enough that your hardware is not a bottleneck. Disks, CPU, network, all exceed the capacity of the naive software methods. Further, let's say you're unlucky enough that the payload to transfer is large enough to where rising to the capacity of the hardware Would Be Great. Now we can talk a bit about what gratis software choices can improve performance in your case, making good use of what was paid for.</p>
+<h4 id="fast-data-algorithms">Fast Data Algorithms</h4>
+<p>The first thing I did was read <a href="https://jolynch.github.io/posts/use_fast_data_algorithms/">Joel Lynch's Excellent Blog Post</a> on the same-similar question, which acted as my starting point. In sum, the article recommends the use of more modern tools like <code>xxh64sum</code> over <code>md5sum</code> and <code>zstd</code> over <code>tar</code> for significant benefits in speed. I ended up with a Bash snippet that looked much like the ones he lists near the end of the article, with various flags and logging added (and another one, for the download side).</p>
+<h4 id="s3-protocol-tuning">S3 protocol tuning</h4>
+<p>As it so happens, <code>aws-cli</code> has S3 protocol defaults that are definitely not appropriate for high-performance systems.</p>
+<p>You may observe this in seeing large files that have a disprortionately higher upload speed. While part of this effect may be the typical divide between sequential and random I/O operations (in which sequential operations are typically faster, in turn explained by cache hit rates, transaction overhead, etc), a potentially nonobvious part is S3 multiparting. For a single file, S3 imposes a 10,000 multipart limit, i.e., at most 10,000 multiparts can be used to upload it.</p>
+<p>While the default <code>aws-cli</code> multipart size is 8MB, uploading a file over the size of 10000 * 8MB = 80GB (as might be encountered in a large transfer of scientific data) will start to affect the multipart size so as to fit inside this 10,000 part limit, which in itself has a potentially significant effect on bandwidth used, especially in the typically high-latency links to an S3 service as accessed over the Internet.</p>
+<p>Nothing stops you from setting this multipart size value higher in the absence of such a large file, and performance-focused S3 clients such as <code>s5cmd</code> often do this by default (it uses 50MiB by default).</p>
+<p>You can also look into the other more straightforwarding setting of <code>max_concurrent_requets</code>, which you can expect to linearly use more bandwidth when raised (up until the usual &quot;knee point&quot;).</p>
+<h4 id="s5cmd">s5cmd</h4>
+<p>For very fast networks, and especially for upload of many small files, you may want to consider <code>s5cmd</code> over <code>aws-cli</code>. It is an S3-focused tool written in Go aiming to achieve exactly best performance.</p>
+<p>Joshua Robinson wrote <a href="https://joshua-robinson.medium.com/s5cmd-for-high-performance-object-storage-7071352cc09d">an article</a> about the performance gains possible. In my case, I was not able to run s5cmd because of a <code>ulimit</code> on a shared machine -- it more aggressively uses multiprocessing.</p>
+<h4 id="get-to-high-ground">Get to High Ground</h4>
+<p>Depending on the bandwidth you want, you should survey your network for a position with the greatest speed. On university HPC clusters, for instance, it is not unusual for login node machines to have better internet linerates than compute nodes. However, this might present some concerns for neighborly behavior. It's best to confer with helpdesk or available documentation about what is appropriate (they might also advise you on approach w.r.t. filesystems -- for example, it is best to read off of an SSD-backed Lustre scratch system where the files are originally generated vs. the tape-backed archive system.).</p>
+<h4 id="retry-probably-won-t-retry-all-errors">--retry probably won't retry all errors</h4>
+<p>Over a long-enough timescale and/or when pushing the system(s) sufficiently hard, you're likely going to run into transient errors when talking to the S3 service. These can be errors semantically (429, too many requests, try again later) or brutally (connection reset).</p>
+<p>You should know that the AWS-SDK-approved ideology here is for not all errors to be retryable. Therefore, the <code>--retry</code> flag that you stick onto your command of choice may not catch these. <a href="https://github.com/aws/aws-sdk-go/issues/4793">The reason for this</a> is that it could cause non-idempotent requests to be repeated.</p>
+<p>While S3 client implementations can make their own choices on top of the general AWS SDK, they may also go with the default behavior. I have found that both <code>s5cmd</code> and <code>aws-cli</code>, <a href="https://github.com/peak/s5cmd/issues/294">in some cases in spite of effort</a>, follow this default AWS SDK behavior.</p>
+<p>Long-story-short, you may need a retry loop of your own. <a href="https://github.com/elastic/elasticsearch/pull/48560">This ElasticSearch PR</a> shows one possible Bash implementation.</p>
+
+	      
+	    <script src="https://giscus.app/client.js"
+        data-repo="aeblyve/leonid.belyaev.systems"
+        data-repo-id="R_kgDOLjz0KA"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOLjz0KM4CeJTK"
+        data-mapping="title"
+        data-strict="1"
+        data-reactions-enabled="0"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async>
+</script>
+
+
+	      </div>
+
+
+
+	    </article>
+	    </div>
+
+	</main>
+    </body>
+</html>

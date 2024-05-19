@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="utf-8">
+	<meta name="description" content="The personal website of Leonid Belyaev.">
+	<meta name="author" content="Leonid Belyaev">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/style.css">
+	<title>Evaluation of Meshtastic</title>
+    </head>
+    <body>
+	<main>
+	    <div class="main-container">
+	    <div class="sidebar">
+
+	<div class="bannerbox">
+	<div class="namebox">
+	<a href="/">
+	Leonid Belyaev
+	<small>
+	leonid.belyaev.systems
+	</small>
+	</a>
+	</div>
+	</div>
+
+	<nav>
+	<ul>
+		<li>
+			<a href="/about.html">About</a>
+		</li>
+		<li>
+			<a href="/posts.html">Posts</a>
+		</li>
+		<li>
+			<a href="/links.html">Links</a>
+		</li>
+		<li>
+			<a href="/uses-this.html">Uses This</a>
+		</li>
+
+		<li>
+			<a href="https://github.com/aeblyve">GitHub</a>
+		</li>
+		<li>
+			<a href="mail:lennybelyaev@gmail.com">lennybelyaev@gmail.com</a>
+		</li>
+		<li>
+			<a href="/leonidbelyaevsystems.zip">Download Site Archive</a>
+		</li>
+		<li>
+			<a href="/rss.xml">RSS Feed</a>
+		</li>
+	</ul>
+	</nav>
+	<div class="disclaimer">
+		<small>
+		<p>
+		Opinions are my own and not representative of my employers.
+		</p>
+		</small>
+		<small>
+		<p>
+		All site content CC-0 unless otherwise indicated.
+		</p>
+		</small>
+	</div>
+
+
+	<br/>
+	<br/>
+	</div>
+	    <article>
+	      <div class="articleheader">
+
+		      <div class="articletitle">
+			<h1>Evaluation of Meshtastic</h1>
+			<small class="raw"><a href="/posts/evaluation-of-meshtastic.md">Raw Markdown</a></small>
+		      </div>
+		
+		<div>
+		<small>Created at: 2024-05-17 00:01:46+00:00</small>
+		<small>Edited at: 2024-05-17 00:01:46+00:00</small>
+		</div>
+		
+	      </div>
+
+	      <div class="articlecontent">
+		    <p>I've been interested in computer communication by means of radio using lower power over longer distances for a while. This is a primary reason for my getting a Technician-class Ham Radio license; <a href="https://www.onallbands.com/word-of-the-day-rag-chewing/">Rag-Chewing</a> was of less interest to me.</p>
+<p><a href="https://en.wikipedia.org/wiki/High_frequency">HF</a>, however, has limitations. While <a href="http://naqcc.info/qrpworks.html">QRP distance records</a> can be staggeringly impressive,
+HF antennae tend to be rather large. When operating in the field, a <a href="https://en.wikipedia.org/wiki/Random_wire_antenna">random wire</a> approach combined with antenna tuning is viable, although somewhat cumbersome.</p>
+<p>Even if HF fulfilled all technical requiements, it is also illegal to encrypt transmissions on it as a ham operator. This makes it unsuitable for many practical purposes.</p>
+<p>Enter <a href="https://meshtastic.org/">Meshtastic</a>, running on LoRA, in turn running on 915Mhz in the USA.
+Like 2.4Ghz WiFi, this is one of the (more-or-less) unregulated <a href="https://en.wikipedia.org/wiki/ISM_radio_band">ISM</a> bands, originally reserved legally for equipment like microwave ovens, and therefore, transmission in these bands can be done without a government-issued license, and encryption is legal.
+Range is extended in the meshtastic network by meshing of nodes, or as in Ham Radio, internet-based repeaters, running on <a href="https://en.wikipedia.org/wiki/MQTT">MQTT</a> in this case.
+The current node-to-node transmission distance record is <a href="https://meshtastic.org/docs/overview/range-tests/">254km==158mi</a>.</p>
+<p>LoRA is a proprietary radio communication technique that enables transmission over longer distances using lower power levels.
+Explaining it is beyond the scope of this post. For an explanation of how it works mathematically, see <a href="https://www.youtube.com/watch?v=jHWepP1ZWTk">this video</a>.</p>
+<p>With graduating school and enterfering the workforce, I've had the time and money to finally try it out for myself.
+It follows along a general trend of my technological development -- implementing things in a way that I can control, on my own time, learning a lot along the way. While cellular networking has made access to the internet almost anywhere while out and about trivial, this service presents an opportunity to operate my own &quot;cellular network&quot; without breaking the law. More fantastically, it presents to me a means of ultimately escaping the grip of subscription-based cellular plans and the somewhat &quot;<a href="https://www.youtube.com/watch?v=zfR_Jj4grZE">un-computer</a>&quot; Android and iOS operating systems.</p>
+<h4 id="explaining-channels-and-channel-setup">Explaining Channels and Channel Setup</h4>
+<p>Like IRC or Slack, a channel in Meshtastic is not physical, but virtual. Creating an encrypted logical channel takes a bit of setup.</p>
+<p>Meshtastic radios generally have eight channel slots, which are zero-indexed, with the first channel of index zero coming as default in the firmware. This channel uniquely has the PRIMARY role, which implements the telemetry and position-reporting <a href="https://en.wikipedia.org/wiki/Automatic_Packet_Reporting_System">APRS</a>-like features of Meshtastic. </p>
+<p>This channel should be considered public. It is secured using only a short publically known pre-shared key.</p>
+<p>Radios in the mesh must be set to the same LoRA frequency slot (the physical channel, in this case) in order to relay one another's messages. By default, the primary channel's name is hashed to set this frequency slot. For this reason, keeping the primary channel as the default public one is a reasonable choice for getting-going.</p>
+<p>For private communication, then, a simple configuration is to create one (or more) secondary channels in the index slots 1, 2, etc, and keep the PRIMARY pre-baked channel as-is. To do this with the Meshtastic CLI, with factory-new radios connected:</p>
+<pre><code class="language-bash"># With the first radio connected
+meshtastic --ch-add &lt;NAME&gt;
+meshtastic --ch-set name &lt;SAME_NAME&gt; --ch-set psk random --ch-index 1
+
+# Take note of the generated PSK near the bottom
+meshtastic --info
+
+# With the nth radio connected
+meshtastic --ch-add &lt;SAME_NAME&gt;
+# Enter the PSK found to be generated on the first radio with meshtastic --info
+meshtastic --ch-set name &lt;SAME_NAME&gt; --ch-set psk base64:&lt;GENERATED_PSK&gt; --ch-index 1
+</code></pre>
+<p>More information about channel configuration <a href="https://meshtastic.org/docs/configuration/radio/channels/">here</a>. It is possible to create a more secure configuration without position sharing if desired.</p>
+<h4 id="range-test-setup">Range Test Setup</h4>
+<p>My test setup was as follows: my rack-mounted desktop computer was connected to a radio base station (a <a href="https://store.rakwireless.com/products/wisblock-meshtastic-starter-kit?variant=43683420438726">WisBlock Meshtastic Starter Kit</a>) by USB serial cable. While on foot, I used a <a href="https://www.lilygo.cc/products/t-beamsupreme-m?variant=43067943977141">T-Beam SUPREME</a> to attempt to contact my home node. Both systems ran <a href="https://www.digikey.com/en/products/detail/te-connectivity-linx/ant-916-cw-hw/809424">Linx 916Mhz Antennae</a>.</p>
+<p>My objective was to not only reach my home node from the mobile radio, but also for the home node to reach the mobile radio with a contentful response. A simple bot was programmed using <a href="https://docs.rs/meshtastic/latest/meshtastic/">this Rust meshtastic library</a> to respond to any sender of the string <code>/weather</code> on private channel with a formatted <code>curl</code> of <code>https://wttr.in</code>, forming a sort of poor-man's NOAA service (which pool lifeguards might find as the sole entertainment on their walkie-talkies during an eleven-hour shift). Operating the mobile radio was done using a <a href="https://www.gpd.hk/gpdpocket3">GPD Pocket 3</a> portable PC, USB cable, and Meshtastic CLI.</p>
+<p>Because I knew that <code>$CITY</code> hosts a meshtastic node in its tallest building, I knew that positioning my home node such that it could hit this building would dramatically improve connectivity to and from my mobile radio. In my case, it was necessary to move the home node just a meter or so from out of my internal brick wall and barred windows into a patio outside. I didn't have true line-of-sight to the elevated node, but this was sufficient to get reliable pings to it and others in the neighborhood -- otherwise there was nothing.</p>
+<h4 id="range-test-results">Range Test Results</h4>
+<p>With line of sight to the elevated node, I was able to hit my home node and receive a reply within 1~ second as far away as one mile distance between. I didn't put in the time to walk further out, but I would imagine that yet greater range would be totally possible, so long as a good line-of-sight was maintained -- I found that even limited obstructions could reduce reliability, sometimes down to zero. Range tests from operation at home definitely suggest this, as I can hit other remote nodes at a greater distance without doing anything special. Because of the importance of line of sight (and a lack of <a href="https://en.wikipedia.org/wiki/Switched-mode_power_supply">noisy SPMS power supplies</a>, etc), open spaces like parks and rivers open up connectivity more so relative to more settled areas.</p>
+<h4 id="conclusion">Conclusion</h4>
+<p>While programmed Meshtastic communication won't outright replace my smartphone and cell service anytime soon, I'd like to continue working in this ecosystem.</p>
+<p>Among other things, I'd like to build an enclosed weatherproof home node, potentially using solar panels to stay self-sufficient. This way I could have a permanent home node I wouldn't be restricted to operating only on dry days at the cost of an open window.</p>
+<p>Something that I would like to explore is implementing a bridge for my IM
+messenger of choice, or perhaps email. Meshtastic cannot support many users in constant chatty IM, but it could be neighborly and usable for sending a simple &quot;BRB&quot; type message.</p>
+<p>Some Meshtastic systems support <a href="https://www.rowetel.com/wordpress/?page_id=452">codec2</a>-encoded audio messages.</p>
+<p>Brutal lossy image compression by means of LLMs and GenAI is another potential, crushing images down to a semantic description and re-generating them on the other end.</p>
+<p>With a Meshtastic node hooked up to the internet and my home network, a variety of other automations could be developed. The key is working within the limits of the <a href="https://meshtastic.org/docs/overview/radio-settings/#data-rates">low datarate</a>.</p>
+<h4 id="further-reading">Further Reading</h4>
+<p><a href="https://meshtastic.org/docs/overview/mesh-algo/">Meshtastic Mesh Algorithm</a></p>
+
+	      
+	    <script src="https://giscus.app/client.js"
+        data-repo="aeblyve/leonid.belyaev.systems"
+        data-repo-id="R_kgDOLjz0KA"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOLjz0KM4CeJTK"
+        data-mapping="title"
+        data-strict="1"
+        data-reactions-enabled="0"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async>
+</script>
+
+
+	      </div>
+
+
+
+	    </article>
+	    </div>
+
+	</main>
+    </body>
+</html>

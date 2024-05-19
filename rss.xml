@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Leonid Belyaev</title>
+  <link>https://leonid.belyaev.systems</link>
+  <description>Leonid Belyaev's personal website.</description>
+  <item>
+    <title>On Optimizing S3 Transfers</title>
+    <link>https://leonid.belyaev.systems/posts/on-optimizing-large-s3-transfers.html</link>
+    <description>On transfering data to and from S3 services quickly and correctly.</description>
+  </item>
+  <item>
+    <title>Evaluation of Meshtastic</title>
+    <link>https://leonid.belyaev.systems/posts/evaluation-of-meshtastic.html</link>
+    <description>Evaluation of the Meshtastic mesh network system on 915MHz LoRA</description>
+  </item>
+</channel>
+
+</rss> 
