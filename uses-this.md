@@ -1,5 +1,5 @@
 ---
-build_date: 2024-07-06 16:05:44+00:00
+build_date: 2025-07-06 03:19:23+00:00
 title: Uses This
 link: https://leonid.belyaev.systems/uses-this.html
 ---
@@ -8,18 +8,15 @@ link: https://leonid.belyaev.systems/uses-this.html
 Tool use is everything and nothing. The most important thing is to get work done.
 
 ### i3 Window Manager
-By [Michael Stapelberg](https://michael.stapelberg.ch/) et al.
-Fast, uses screen space effectively. 
+Fast, uses screen space effectively.
 FOSS.
 
 ### Emacs Editor
-By [Richard Stallman](https://stallman.org/) et al.
-Runs everywhere (GUI, TUI), highly extensible. 
+Runs everywhere (GUI, TUI), highly extensible.
 Used with evil-mode. Org-mode for personal organization pretty extensively.
 FOSS.
 
 ### NixOS Operating System
-By [Eelco Dolstra](https://edolstra.github.io/) et al.
 Declaratively and centrally configured Linux distribution.
 Contrast with Ansible, which is more imperative-brained, vs functional.
 Useful for re-using configuration between systems, rollback stability.
@@ -28,12 +25,10 @@ Technically source-based but purity and reproducibility means binary distributio
 FOSS.
 
 ### `lf` File Manager
-By [Gökçehan Kara](https://gokcehan.github.io/) et al.
-Terminal-oriented, customizable, fast. 
+Terminal-oriented, customizable, fast.
 FOSS.
 
 ### ActivityWatch Automatic Time Tracker
-By [Erik Bjäreholt](https://erik.bjareholt.com/) et al.
 Shows you what you do on the computer, without intervention on your part.
 Plugins for browsers, editors. Some work on Android.
 FOSS.
@@ -43,7 +38,14 @@ I use this to switch between work and personal computers.
 Cross-platform, although I only use it on NixOS.
 FOSS.
 
+### Zotero
+Primarily billed as a reference/bibliography manager for researchers, but I use it mostly to read documents/books and take highlights on Linux.
+
+### Netbird Mesh VPN
+Self-hostable Mesh VPN solution.
+Built on top of Wireguard, but with more advanced features like 2FA against an IDP and audit logs.
+Clients for many operating systems, incl. Android.
+
 ### Requests
 
-I'm currently on the lookout for something like Readwise Reader, although self-hosted.
-Feel free to contact me if you know of something that fits the bill.
+None at this time.
