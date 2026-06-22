@@ -48,7 +48,7 @@ body {
 
 article {
     flex: 4;
-    height: 800px;
+    /* height: 800px; */
 }
 
 h1 {
@@ -108,7 +108,8 @@ nav ul {
 
 .articlecontent {
     padding: 0px 0px 20px 20px;
-    height: 720px;
+    /* height: 720px; */
+	height: 90dvh;
     overflow: auto;
 }
 
