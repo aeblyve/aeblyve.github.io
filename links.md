@@ -1,5 +1,5 @@
 ---
-build_date: 2026-06-22 03:38:19+00:00
+build_date: 2026-06-22 03:42:21+00:00
 title: Links
 link: https://leonid.belyaev.systems/links.html
 ---
@@ -19,3 +19,4 @@ link: https://leonid.belyaev.systems/links.html
 * [George Hotz](https://geohot.github.io/blog/)
 * [100 Rabbits](https://100r.co/site/home.html)
 * [Don't Call Yourself a Programmer](https://www.kalzumeus.com/2011/10/28/dont-call-yourself-a-programmer/)
+* [SDO Study](https://www.sdo.group/study)
