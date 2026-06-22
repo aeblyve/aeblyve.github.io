@@ -1,5 +1,5 @@
 ---
-build_date: 2026-06-22 03:32:43+00:00
+build_date: 2026-06-22 03:34:26+00:00
 title: About
 link: https://leonid.belyaev.systems/about.html
 ---
