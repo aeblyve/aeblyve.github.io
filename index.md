@@ -1,11 +1,9 @@
 ---
-build_date: 2026-06-23 22:37:14+00:00
+build_date: 2026-06-23 22:40:51+00:00
 title: Root
 link: https://leonid.belyaev.systems/index.html
 ---
 
-
-![LeonidBelyaev](/img/cyclops.jpeg)
 
 This is the personal website of Leonid Belyaev.
 
