@@ -1,7 +1,7 @@
 ---
 create_date: 2024-05-17 00:01:46+00:00
 edit_date: 2024-05-17 00:01:46+00:00
-build_date: 2026-06-23 22:29:47+00:00
+build_date: 2026-06-23 22:37:14+00:00
 title: Evaluation of Meshtastic
 link: https://leonid.belyaev.systems/posts/evaluation-of-meshtastic.html
 ---

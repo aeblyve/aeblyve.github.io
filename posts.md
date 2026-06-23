@@ -1,5 +1,5 @@
 ---
-build_date: 2026-06-23 22:29:47+00:00
+build_date: 2026-06-23 22:37:14+00:00
 title: Posts
 link: https://leonid.belyaev.systems/posts.html
 ---
